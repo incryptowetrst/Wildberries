@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WB Parser Pro</title>
+  <style>
+    body {
+      width: 500px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    button {
+      padding: 10px 15px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover { background: #45a049; }
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    #progress {
+      height: 120px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 10px;
+      margin-bottom: 15px;
+      background: #f9f9f9;
+      font-size: 0.9em;
+    }
+    #results {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      padding: 10px;
+      background: #fff;
+    }
+    .item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .error { color: #d32f2f; }
+    .success { color: #388e3c; }
+    .warning { color: #ff9800; }
+    .url { 
+      word-break: break-all;
+      font-size: 0.9em;
+      color: #1a0dab;
+      margin: 5px 0;
+    }
+    .input-section {
+      margin-bottom: 15px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      margin-bottom: 10px;
+      font-family: Arial, sans-serif;
+    }
+    .urls-textarea {
+      height: 100px;
+    }
+    .proxies-textarea {
+      height: 80px;
+    }
+    .example-link {
+      color: #1a0dab;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-bottom: 5px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    .example-link:hover {
+      text-decoration: underline;
+    }
+    .clear-btn {
+      background: #f44336;
+      margin-left: 10px;
+    }
+    .clear-btn:hover {
+      background: #d32f2f;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .proxy-section {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+    
+    .proxy-check-section {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e3f2fd;
+      border-radius: 4px;
+    }
+    
+    .proxy-check-btn {
+      background: #2196F3;
+      margin-left: 10px;
+    }
+    
+    .proxy-check-btn:hover {
+      background: #0b7dda;
+    }
+    
+    .proxy-status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      display: none;
+    }
+    
+    .proxy-working {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .proxy-failed {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .retry-section {
+      margin-top: 10px;
+      padding: 10px;
+      background: #fff8e1;
+      border-radius: 4px;
+    }
+    .export-section {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e8f5e9;
+      border-radius: 4px;
+    }
+    .progress-bar {
+      height: 5px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: #4CAF50;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .stats {
+      font-size: 0.9em;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+    .attempt-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 10px;
+      background: #e0e0e0;
+      font-size: 0.8em;
+      margin-left: 5px;
+    }
+    .article-link {
+      margin-left: 10px;
+      color: #1a0dab;
+      text-decoration: none;
+    }
+    .article-link:hover {
+      text-decoration: underline;
+    }
+    #dropZone {
+      border: 2px dashed #ccc;
+      border-radius: 4px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    #dropZone:hover, #dropZone.dragover {
+      background-color: #f0f7ff;
+      border-color: #2196F3;
+    }
+    #dropZone p {
+      margin: 0;
+      color: #666;
+    }
+    #dropZone .icon {
+      font-size: 40px;
+      color: #2196F3;
+      margin-bottom: 10px;
+    }
+    #fileList {
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+    .file-item {
+      background: #e9f7fe;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .remove-file {
+      color: #f44336;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #exportBtn {
+      background: #2196F3;
+      margin-left: 10px;
+    }
+    #exportBtn:hover {
+      background: #0b7dda;
+    }
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+    .action-buttons {
+      display: flex;
+    }
+    .counter-container {
+      position: sticky;
+      top: 0;
+      background: #ffffff;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .counter {
+      font-weight: bold;
+      font-size: 1.1em;
+      color: #1a73e8;
+      text-align: center;
+      padding: 5px;
+      background: #e8f0fe;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <h2>Wildberries Парсер Pro</h2>
+  
+  <!-- Фиксированный счетчик прогресса -->
+  <div class="counter-container">
+    <div class="counter" id="globalCounter">Обработано: 0/0</div>
+  </div>
+  
+  <div class="input-section">
+    <div class="section-title">Загрузите файл с артикулами:</div>
+    <div id="dropZone">
+      <div class="icon">📁</div>
+      <p>Перетащите файл сюда или кликните для выбора</p>
+      <p><small>Поддерживаемые форматы: TXT (артикулы по одному в строке)</small></p>
+      <div id="fileList"></div>
+    </div>
+    <input type="file" id="fileInput" accept=".txt" style="display: none;">
+  </div>
+  
+  <div class="input-section">
+    <div class="section-title">Артикулы товаров:</div>
+    <textarea id="articles" class="urls-textarea" placeholder="Артикулы появятся здесь после загрузки файла"></textarea>
+    
+    <div>
+      <span class="example-link" id="example1">Пример 1</span>
+      <span class="example-link" id="example2">Пример 2</span>
+    </div>
+  </div>
+  
+  <div class="proxy-section">
+    <div class="section-title">Прокси-серверы (IP:PORT:USER:PASS):</div>
+    <textarea id="proxies" class="proxies-textarea" placeholder="178.250.185.165:3000:nsT1mK:CBlTTstzHC
+109.107.160.165:3000:nsT1mK:CBlTTstzHC"></textarea>
+  </div>
+  
+  <div class="proxy-check-section">
+    <div class="section-title">Настройки проверки прокси:</div>
+    <div>
+      <label>
+        <input type="checkbox" id="enableProxyCheck" checked> Проверять прокси перед началом
+      </label>
+      <button id="checkProxiesBtn" class="proxy-check-btn">Проверить прокси</button>
+    </div>
+    <div id="proxyStatus" class="proxy-status"></div>
+  </div>
+  
+  <div class="retry-section">
+    <div class="section-title">Настройки повторных попыток:</div>
+    <div>
+      <label>
+        <input type="checkbox" id="enableRetry" checked> Повторять неудачные попытки
+      </label>
+      <label style="margin-left: 15px;">
+        Максимум попыток: 
+        <input type="number" id="maxRetries" min="1" max="5" value="3" style="width: 50px;">
+      </label>
+    </div>
+  </div>
+  
+  <div class="export-section">
+    <div class="section-title">Настройки экспорта:</div>
+    <div>
+      <label>
+        <input type="checkbox" id="autoExport" checked> Автоматически выгружать в Excel после парсинга
+      </label>
+    </div>
+  </div>
+  
+  <div class="buttons-container">
+    <div class="action-buttons">
+      <button id="startBtn">Запустить парсинг</button>
+      <button id="exportBtn">Выгрузить в Excel</button>
+    </div>
+    <button id="clearBtn" class="clear-btn">Очистить</button>
+  </div>
+  
+  <div id="progress">
+    <div>Готов к работе. Загрузите файл с артикулами</div>
+    <div class="progress-bar">
+      <div class="progress-bar-inner" id="progressBar"></div>
+    </div>
+  </div>
+  
+  <div id="results"></div>
+  
+  <script src="lib/xlsx.full.min.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
